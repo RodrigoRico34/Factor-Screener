@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.router.stocks import router as stocks_router
 
 app = FastAPI(
     title="Factor Screener",
@@ -16,8 +17,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(stocks_router)
 
 @app.get("/")
 def health_check():
     """Health check endpoint to verify the server is running."""
     return {"status": "ok", "message": "Factor Screener API is running"}
+

@@ -14,3 +14,20 @@ class Stock(Base):
 def read_all_stocks(db: Session) -> list[Stock]:
     return db.query(Stock).all()
 
+
+def get_stock_by_ticker(db: Session, ticker: str):
+    return db.query(Stock).filter_by(ticker=ticker).first()
+
+
+def create_stock(db: Session, stock: dict):
+    new_stock = Stock(
+        ticker=stock["Symbol"],
+        name=stock["Name"],
+        sector=stock["Sector"]
+    )
+    db.add(new_stock)
+
+
+def update_stock(db, existing, stock: dict):
+    existing.name = stock["Name"]
+    existing.sector = stock["Sector"]

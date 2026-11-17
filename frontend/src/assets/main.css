@@ -1,0 +1,13 @@
+/*
+ * Author:      Samuel Theytaz
+ * Created:     17.11.2026
+ * Modified:    17.11.2026
+ * Description: Global styles of the application (page margin, background, text color and font)
+ */
+
+body {
+  margin: 0;
+  background-color: #0a1120;
+  color: #e6ecf5;
+  font-family: system-ui, sans-serif;
+}

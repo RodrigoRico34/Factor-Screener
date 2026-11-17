@@ -2,12 +2,154 @@
  * Author:      Samuel Theytaz
  * Created:     17.11.2026
  * Modified:    17.11.2026
- * Description: Global styles of the application (page margin, background, text color and font)
+ * Description: Global styles of the application, with the colors and the fonts of the Figma file
+ *              Base style of the titles, tables and buttons, adapted for tablets
  */
+
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* Same names as the variables of the Figma file (page Fondations et composants) */
+:root {
+  --fs-fond-base: #0a1120;
+  --fs-fond-surface: #0f1a2d;
+  --fs-fond-eleve: #15233a;
+  --fs-bordure-defaut: #1f2e48;
+  --fs-bordure-forte: #2c3e5f;
+  --fs-bleu-marque: #1f4e79;
+  --fs-bleu-marque-contour: #2d6699;
+  --fs-bleu-accent: #5b9be0;
+  --fs-bleu-accent-attenue: #14304f;
+  --fs-bleu-clair: #9cc2ec;
+  --fs-texte-principal: #e6ecf5;
+  --fs-texte-secondaire: #97a5bd;
+  --fs-texte-discret: #7d8ca6;
+  --fs-texte-sur-marque: #ffffff;
+  --fs-signal-positif: #3fb58e;
+  --fs-signal-negatif: #e2686e;
+  --fs-signal-negatif-attenue: #371a21;
+  --fs-decile-vide: #22324f;
+
+  --fs-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --fs-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
 
 body {
   margin: 0;
-  background-color: #0a1120;
-  color: #e6ecf5;
-  font-family: system-ui, sans-serif;
+  background-color: var(--fs-fond-base);
+  color: var(--fs-texte-principal);
+  font-family: var(--fs-font-sans);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+}
+
+a {
+  color: var(--fs-bleu-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Tickers, scores and other numbers */
+.number {
+  font-family: var(--fs-font-mono);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--fs-fond-surface);
+}
+
+th,
+td {
+  padding: 0 24px;
+  border-bottom: 1px solid var(--fs-bordure-defaut);
+  text-align: left;
+}
+
+th {
+  height: 44px;
+  background-color: var(--fs-fond-eleve);
+  color: var(--fs-texte-secondaire);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+td {
+  height: 52px;
+}
+
+button {
+  height: 40px;
+  padding: 0 24px;
+  border: 1px solid var(--fs-bleu-marque-contour);
+  border-radius: 8px;
+  background-color: var(--fs-bleu-marque);
+  color: var(--fs-texte-sur-marque);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--fs-bleu-marque-contour);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  height: 36px;
+  padding: 0 16px;
+  border-color: var(--fs-bordure-forte);
+  background-color: transparent;
+  color: var(--fs-texte-secondaire);
+}
+
+button.secondary:hover {
+  color: var(--fs-texte-principal);
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  th,
+  td {
+    padding: 0 16px;
+  }
 }

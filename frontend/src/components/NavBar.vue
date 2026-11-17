@@ -29,8 +29,8 @@ import { RouterLink } from 'vue-router'
 
 <style scoped>
 .navbar {
-  background-color: #0f1a2d;
-  border-bottom: 1px solid #1f2e48;
+  background-color: var(--fs-fond-surface);
+  border-bottom: 1px solid var(--fs-bordure-defaut);
 }
 
 .navbar-content {
@@ -62,19 +62,19 @@ import { RouterLink } from 'vue-router'
   align-items: center;
   padding: 0 16px;
   border-bottom: 2px solid transparent;
-  color: #97a5bd;
+  color: var(--fs-texte-secondaire);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
 }
 
 .links a:hover {
-  color: #e6ecf5;
+  color: var(--fs-texte-principal);
 }
 
 /* RouterLink adds this class to the link of the current page */
 .links a.router-link-active {
-  color: #e6ecf5;
-  border-bottom-color: #5b9be0;
+  color: var(--fs-texte-principal);
+  border-bottom-color: var(--fs-bleu-accent);
 }
 </style>

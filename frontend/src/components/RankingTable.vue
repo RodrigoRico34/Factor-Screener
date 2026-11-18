@@ -4,6 +4,7 @@
   Modified:    18.11.2026
   Description: Ranking table (US-204) with the columns ticker, name, sector, 12m score and decile
                It only displays the stocks it receives, it doesn't load them itself
+               While "loading" is true, a loading row is shown instead of the stocks
 -->
 
 <script setup>
@@ -11,6 +12,10 @@ defineProps({
   stocks: {
     type: Array,
     required: true,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -45,7 +50,14 @@ function formatScore(score) {
       </thead>
 
       <tbody>
-      <tr v-for="stock in stocks" :key="stock.ticker">
+      <tr v-if="loading">
+        <td :colspan="columns.length" class="state">
+          <span class="loader" aria-hidden="true"></span>
+          Chargement des actions…
+        </td>
+      </tr>
+
+      <tr v-for="stock in loading ? [] : stocks" :key="stock.ticker">
         <td class="col-ticker">
           <span class="ticker">{{ stock.ticker }}</span>
         </td>
@@ -72,8 +84,8 @@ function formatScore(score) {
         </td>
       </tr>
 
-      <tr v-if="stocks.length === 0">
-        <td :colspan="columns.length" class="empty">Aucune action à afficher</td>
+      <tr v-if="!loading && stocks.length === 0">
+        <td :colspan="columns.length" class="state">Aucune action à afficher</td>
       </tr>
       </tbody>
     </table>
@@ -207,9 +219,28 @@ td.col-momentum_12m {
   background: var(--accent);
 }
 
-.empty {
+/* Loading and empty rows */
+.state {
   height: 80px;
   text-align: center;
   color: var(--text-muted);
+}
+
+.loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  vertical-align: -2px;
+  border: 2px solid var(--bar-empty);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

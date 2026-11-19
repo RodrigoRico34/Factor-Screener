@@ -31,3 +31,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Node / Vue
+node_modules/
+dist/
+.env.local
+.env.*.local

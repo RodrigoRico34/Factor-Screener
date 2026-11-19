@@ -3,7 +3,15 @@ import pandas as pd
 import logging
 
 from app.data.models.price import read_all_prices
-from app.data.models.factor import get_factor, create_factor, update_factor_momentum
+from app.data.models.factor import (
+    Factor,
+    get_factor,
+    create_factor,
+    update_factor_momentum,
+    read_factors_by_date,
+    update_factor_decile,
+    get_latest_factor_date,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,3 +57,34 @@ def compute_momentum_core(db: Session):
 
     db.commit()
     return {"computed": count}
+
+
+def classify_deciles_core(db: Session):
+    # Get the most recent date that has momentum values
+    latest = get_latest_factor_date(db)
+
+    if not latest:
+        return {"classified": 0}
+
+    factors = read_factors_by_date(db, latest)
+
+    # Build a Series of momentum values indexed by factor ID
+    data = {f.id: f.momentum_12m for f in factors if f.momentum_12m is not None}
+
+    if not data:
+        return {"classified": 0}
+
+    series = pd.Series(data)
+
+    # Classify into deciles (1 = worst, 10 = best)
+    deciles = pd.qcut(series, 10, labels=range(1, 11), duplicates="drop")
+
+    factor_by_id = {f.id: f for f in factors}
+
+    count = 0
+    for factor_id, decile in deciles.items():
+        update_factor_decile(factor_by_id[factor_id], int(decile))
+        count += 1
+
+    db.commit()
+    return {"classified": count}

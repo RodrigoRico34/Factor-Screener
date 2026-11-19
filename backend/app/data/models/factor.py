@@ -36,3 +36,16 @@ def create_factor(db: Session, stocks_id: int, date, momentum_12m: float):
 
 def update_factor_momentum(existing: Factor, momentum_12m: float):
     existing.momentum_12m = momentum_12m
+
+
+def update_factor_decile(existing: Factor, decile: int):
+    existing.decile = decile
+
+
+def read_factors_by_date(db: Session, date):
+    return db.query(Factor).filter_by(date=date).all()
+
+
+def get_latest_factor_date(db: Session):
+    result = db.query(Factor.date).order_by(Factor.date.desc()).first()
+    return result[0] if result else None

@@ -7,7 +7,6 @@
 
   <div class="filters">
     <div class="search-box">
-      <span class="search-icon">&#x1F50D;</span>
       <input
           v-model="searchQuery"
           type="text"

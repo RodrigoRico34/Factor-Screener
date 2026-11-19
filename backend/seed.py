@@ -4,6 +4,9 @@ from app.core.prices import import_prices_core
 from app.core.factors import compute_momentum_core, classify_deciles_core
 from app.data.tickers.sp500_github_client import SP500Github
 from app.data.prices.yfinance_client import YFinanceClient
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def seed():

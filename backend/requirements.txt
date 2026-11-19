@@ -4,7 +4,7 @@ sqlalchemy==2.0.35
 python-dotenv==1.0.1
 PyMySQL==1.1.1
 cryptography
-yfinance==0.2.43
+yfinance==1.8.0
 numpy
 pandas
 requests

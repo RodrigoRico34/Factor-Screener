@@ -16,8 +16,11 @@
 
     <div class="sector-filter">
       <span class="sector-label">Secteur</span>
-      <select>
-        <option>Tous les secteurs</option>
+      <select v-model="selectedSector">
+        <option value="">Tous les secteurs</option>
+        <option v-for="sector in sectors" :key="sector" :value="sector">
+          {{ sector }}
+        </option>
       </select>
     </div>
   </div>
@@ -70,15 +73,19 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getStocks } from '@/services/api'
+import { getStocks, getSectors } from '@/services/api'
 
 const stocks = ref([])
+const sectors = ref([])
 const loading = ref(true)
 const error = ref(null)
 
 // Sort state: default is score 12m descending (best performers on top)
 const sortKey = ref('score_12m')
 const sortAsc = ref(false)
+
+// Filter state
+const selectedSector = ref('')
 
 function toggleSort(key) {
   if (sortKey.value === key) {
@@ -95,11 +102,17 @@ function sortIcon(key) {
 }
 
 const sortedStocks = computed(() => {
-  return [...stocks.value].sort((a, b) => {
+  let filtered = stocks.value
+
+  // Filter by sector
+  if (selectedSector.value) {
+    filtered = filtered.filter(s => s.sector === selectedSector.value)
+  }
+
+  return [...filtered].sort((a, b) => {
     let valA = a[sortKey.value]
     let valB = b[sortKey.value]
 
-    // Null values go to the end
     if (valA == null) return 1
     if (valB == null) return -1
 
@@ -122,7 +135,12 @@ function formatScore(value) {
 
 onMounted(async () => {
   try {
-    stocks.value = await getStocks()
+    const [stocksData, sectorsData] = await Promise.all([
+      getStocks(),
+      getSectors(),
+    ])
+    stocks.value = stocksData
+    sectors.value = sectorsData
   } catch (e) {
     error.value = e.message
   } finally {

@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 import logging
-from app.data.models.stock import create_stock, get_stock_by_ticker, update_stock
-
+from app.data.models.stock import create_stock, get_stock_by_ticker, update_stock, read_all_stocks
 
 logger = logging.getLogger(__name__)
 
@@ -24,3 +23,16 @@ def import_stocks_core(db: Session, client):
 
     db.commit()
     return {"imported": count}
+
+
+def get_stocks_ranking(db: Session):
+    return [
+        {
+            "ticker": s.ticker,
+            "name": s.name,
+            "sector": s.sector,
+            "score_12m": None,
+            "decile": None,
+        }
+        for s in read_all_stocks(db)
+    ]

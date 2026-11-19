@@ -26,6 +26,7 @@ def compute_momentum_core(db: Session):
     df["close"] = df["close"].astype(float)
 
     pivot = df.pivot(index="date", columns="stocks_id", values="close").sort_index()
+    pivot.index = pd.to_datetime(pivot.index)
 
     # Resample to monthly (last trading day of each month)
     monthly = pivot.resample("ME").last()

@@ -1,5 +1,6 @@
 from app.data.prices.prices_fetcher import PriceSource, PriceFetchError
 from datetime import datetime, timedelta
+import pandas as pd
 import yfinance as yf
 
 
@@ -35,11 +36,16 @@ class YFinanceClient(PriceSource):
         if data.empty:
             raise PriceFetchError("yfinance returned no data")
 
-        prices = data["Close"]
+        # yfinance 1.x returns MultiIndex columns (Price, Ticker).
+        if isinstance(data.columns, pd.MultiIndex):
+            prices = data["Close"]
+        else:
+            prices = data[["Close"]]
+            prices.columns = yf_tickers
 
         # If only one ticker, prices is a Series (not a DataFrame).
         # Convert to DataFrame so the loop below works in both cases.
-        if len(yf_tickers) == 1:
+        if isinstance(prices, pd.Series):
             prices = prices.to_frame(name=yf_tickers[0])
 
         results = []

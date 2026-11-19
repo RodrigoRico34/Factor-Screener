@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, Integer, String
 from app.data.database import Base
 from sqlalchemy.orm import Session
 
@@ -6,13 +6,14 @@ from sqlalchemy.orm import Session
 class Stock(Base):
     __tablename__ = "stocks"
 
-    ticker = Column(String(50), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ticker = Column(String(10), unique=True, nullable=False)
     name = Column(String(100), nullable=False)
-    sector = Column(String(50), nullable=False)
+    sector = Column(String(45), nullable=False)
 
 
 def read_all_stocks(db: Session) -> list[Stock]:
-    return db.query(Stock).all()
+    return db.query(Stock).order_by(Stock.ticker).all()
 
 
 def get_stock_by_ticker(db: Session, ticker: str):

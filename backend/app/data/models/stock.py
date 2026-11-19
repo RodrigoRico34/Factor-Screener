@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, func
 from app.data.database import Base
 from sqlalchemy.orm import Session
 
@@ -12,8 +12,13 @@ class Stock(Base):
     sector = Column(String(45), nullable=False)
 
 
-def read_all_stocks(db: Session) -> list[Stock]:
-    return db.query(Stock).order_by(Stock.ticker).all()
+def read_all_stocks(db: Session, sector: str | None = None) -> list[Stock]:
+    query = db.query(Stock)
+    #if sector missing or empty, no filter
+    if sector:
+        # compare lowercase on both sides so the filter ignores case
+        query = query.filter(func.lower(Stock.sector) == sector.strip().lower())
+    return query.order_by(Stock.ticker).all()
 
 
 def get_stock_by_ticker(db: Session, ticker: str):

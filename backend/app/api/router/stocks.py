@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -11,9 +11,12 @@ router = APIRouter()
 
 
 @router.get("/stocks", response_model=list[StockRanking])
-def list_stocks(db: Session = Depends(get_db)):
+def list_stocks(
+    sector: str | None = Query(default=None, description="Filter by GICS sector (case-insensitive)"),
+    db: Session = Depends(get_db),
+):
     try:
-        return get_stocks_ranking(db)
+        return get_stocks_ranking(db, sector)
     except SQLAlchemyError:
         # if there is an error with SQLAlchemy database, raise an exception 503
         raise HTTPException(status_code=503, detail="Database unavailable")

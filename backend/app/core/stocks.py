@@ -25,7 +25,7 @@ def import_stocks_core(db: Session, client):
     return {"imported": count}
 
 
-def get_stocks_ranking(db: Session):
+def get_stocks_ranking(db: Session, sector: str | None = None):
     return [
         {
             "ticker": s.ticker,
@@ -34,5 +34,5 @@ def get_stocks_ranking(db: Session):
             "score_12m": None,
             "decile": None,
         }
-        for s in read_all_stocks(db)
+        for s in read_all_stocks(db, sector)
     ]

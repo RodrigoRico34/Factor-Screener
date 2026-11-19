@@ -9,6 +9,7 @@
     <div class="search-box">
       <span class="search-icon">&#x1F50D;</span>
       <input
+          v-model="searchQuery"
           type="text"
           placeholder="Rechercher un ticker ou un nom"
       />
@@ -86,6 +87,7 @@ const sortAsc = ref(false)
 
 // Filter state
 const selectedSector = ref('')
+const searchQuery = ref('')
 
 function toggleSort(key) {
   if (sortKey.value === key) {
@@ -107,6 +109,15 @@ const sortedStocks = computed(() => {
   // Filter by sector
   if (selectedSector.value) {
     filtered = filtered.filter(s => s.sector === selectedSector.value)
+  }
+
+  // Filter by search query (ticker or name, case insensitive)
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(s =>
+        s.ticker.toLowerCase().includes(query) ||
+        s.name.toLowerCase().includes(query)
+    )
   }
 
   return [...filtered].sort((a, b) => {

@@ -42,7 +42,9 @@
     <tbody>
     <tr v-for="stock in sortedStocks" :key="stock.ticker">
       <td>
-        <a class="number" href="#">{{ stock.ticker }}</a>
+        <router-link class="number" :to="`/detail/${stock.ticker}`">
+          {{ stock.ticker }}
+        </router-link>
       </td>
       <td>{{ stock.name }}</td>
       <td>{{ stock.sector }}</td>
@@ -74,6 +76,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { getStocks, getSectors } from '@/services/api'
 
 const stocks = ref([])

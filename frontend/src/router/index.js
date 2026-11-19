@@ -14,7 +14,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', name: 'ranking', component: RankingView },
-    { path: '/detail', name: 'detail', component: DetailView },
+    { path: '/detail/:ticker', name: 'detail', component: DetailView },
     { path: '/backtest', name: 'backtest', component: BacktestView },
   ],
 })

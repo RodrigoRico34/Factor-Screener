@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 import logging
 from app.data.models.stock import create_stock, get_stock_by_ticker, update_stock, read_all_stocks
+from app.data.models.factor import get_latest_factors_map
 
 logger = logging.getLogger(__name__)
 
@@ -58,14 +59,17 @@ def get_stocks_ranking(
     sort_by: str = "score_12m",
     order: str = "desc",
 ):
-    rows = [
-        {
+    factors_map = get_latest_factors_map(db)
+
+    rows = []
+    for s in read_all_stocks(db, sector):
+        factor = factors_map.get(s.id)
+        rows.append({
             "ticker": s.ticker,
             "name": s.name,
             "sector": s.sector,
-            "score_12m": None,
-            "decile": None,
-        }
-        for s in read_all_stocks(db, sector)
-    ]
+            "score_12m": round(float(factor.momentum_12m), 6) if factor and factor.momentum_12m is not None else None,
+            "decile": int(factor.decile) if factor and factor.decile is not None else None,
+        })
+
     return sort_stocks(rows, sort_by, order)

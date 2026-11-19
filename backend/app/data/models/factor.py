@@ -49,3 +49,14 @@ def read_factors_by_date(db: Session, date):
 def get_latest_factor_date(db: Session):
     result = db.query(Factor.date).order_by(Factor.date.desc()).first()
     return result[0] if result else None
+
+
+def get_latest_factors_map(db: Session) -> dict:
+    """
+    Return a dict {stocks_id: Factor} for the most recent factor date.
+    """
+    latest = get_latest_factor_date(db)
+    if not latest:
+        return {}
+    factors = read_factors_by_date(db, latest)
+    return {f.stocks_id: f for f in factors}

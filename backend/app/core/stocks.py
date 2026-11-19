@@ -25,8 +25,40 @@ def import_stocks_core(db: Session, client):
     return {"imported": count}
 
 
-def get_stocks_ranking(db: Session, sector: str | None = None):
-    return [
+ALLOWED_SORT_FIELDS = ("ticker", "name", "sector", "score_12m", "decile")
+ALLOWED_ORDERS = ("asc", "desc")
+
+
+def sort_stocks(rows: list[dict], sort_by: str, order: str) -> list[dict]:
+    if sort_by not in ALLOWED_SORT_FIELDS:
+        raise ValueError(
+            f"Invalid sort_by '{sort_by}'. Allowed values: {', '.join(ALLOWED_SORT_FIELDS)}"
+        )
+    if order not in ALLOWED_ORDERS:
+        raise ValueError(
+            f"Invalid order '{order}'. Allowed values: {', '.join(ALLOWED_ORDERS)}"
+        )
+
+    # rows without a value go last
+    with_value = [row for row in rows if row[sort_by] is not None]
+    without_value = [row for row in rows if row[sort_by] is None]
+
+    def sort_key(row):
+        value = row[sort_by]
+        # lowercase text so "apple" and "Apple" are sorted together
+        return value.lower() if isinstance(value, str) else value
+
+    with_value.sort(key=sort_key, reverse=(order == "desc"))
+    return with_value + without_value
+
+
+def get_stocks_ranking(
+    db: Session,
+    sector: str | None = None,
+    sort_by: str = "score_12m",
+    order: str = "desc",
+):
+    rows = [
         {
             "ticker": s.ticker,
             "name": s.name,
@@ -36,3 +68,4 @@ def get_stocks_ranking(db: Session, sector: str | None = None):
         }
         for s in read_all_stocks(db, sector)
     ]
+    return sort_stocks(rows, sort_by, order)

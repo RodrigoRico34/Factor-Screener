@@ -1,0 +1,51 @@
+from sqlalchemy.orm import Session
+import pandas as pd
+import logging
+
+from app.data.models.price import read_all_prices
+from app.data.models.factor import get_factor, create_factor, update_factor_momentum
+
+logger = logging.getLogger(__name__)
+
+
+def compute_momentum_core(db: Session):
+    all_prices = read_all_prices(db)
+
+    if not all_prices:
+        return {"computed": 0}
+
+    df = pd.DataFrame(all_prices, columns=["stocks_id", "date", "close"])
+    df["close"] = df["close"].astype(float)
+
+    pivot = df.pivot(index="date", columns="stocks_id", values="close").sort_index()
+
+    # Resample to monthly (last trading day of each month)
+    monthly = pivot.resample("ME").last()
+
+    # Momentum 12m = (price_now / price_12m_ago) - 1
+    momentum_12m = (monthly / monthly.shift(12)) - 1
+
+    # Drop rows where we don't have 12 months of history
+    momentum_12m = momentum_12m.dropna(how="all")
+
+    count = 0
+    last_date = momentum_12m.index[-1].date()
+
+    for stocks_id in momentum_12m.columns:
+        # Get this stock's momentum value at the most recent month
+        value = momentum_12m.loc[momentum_12m.index[-1], stocks_id]
+
+        # Skip stocks with insufficient history (NaN momentum)
+        if pd.isna(value):
+            continue
+
+        existing = get_factor(db, int(stocks_id), last_date)
+        if existing:
+            update_factor_momentum(existing, round(float(value), 6))
+        else:
+            create_factor(db, int(stocks_id), last_date, round(float(value), 6))
+
+        count += 1
+
+    db.commit()
+    return {"computed": count}

@@ -29,3 +29,7 @@ def create_price(db: Session, stocks_id: int, date, close: float):
         close=close,
     )
     db.add(new_price)
+
+
+def read_all_prices(db: Session):
+    return db.query(Price.stocks_id, Price.date, Price.close).all()

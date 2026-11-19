@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.router.stocks import router as stocks_router
+from app.api.router.sectors import router as sectors_router
 
 app = FastAPI(
     title="Factor Screener",
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(stocks_router)
+app.include_router(sectors_router)
 
 @app.get("/")
 def health_check():

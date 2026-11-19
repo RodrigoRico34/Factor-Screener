@@ -32,3 +32,10 @@ def create_stock(db: Session, stock: dict):
 def update_stock(db, existing, stock: dict):
     existing.name = stock["Name"]
     existing.sector = stock["Sector"]
+
+
+def read_all_sectors(db: Session) -> list[str]:
+    #order_by to filter by Alphabetical order, and distinct() removes duplicates
+    rows = db.query(Stock.sector).distinct().order_by(Stock.sector).all()
+    #.all() returns tuples like ("Energy",), so row[0] extracts the text
+    return [row[0] for row in rows]

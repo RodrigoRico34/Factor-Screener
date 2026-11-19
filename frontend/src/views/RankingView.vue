@@ -7,6 +7,7 @@
 
   <div class="filters">
     <div class="search-box">
+      <span class="search-icon">&#x1F50D;</span>
       <input
           type="text"
           placeholder="Rechercher un ticker ou un nom"
@@ -27,15 +28,15 @@
   <table v-else>
     <thead>
     <tr>
-      <th>Ticker</th>
-      <th>Nom</th>
-      <th>Secteur</th>
-      <th class="col-right">Score 12m</th>
-      <th>Décile</th>
+      <th @click="toggleSort('ticker')">Ticker {{ sortIcon('ticker') }}</th>
+      <th @click="toggleSort('name')">Nom {{ sortIcon('name') }}</th>
+      <th @click="toggleSort('sector')">Secteur {{ sortIcon('sector') }}</th>
+      <th @click="toggleSort('score_12m')" class="col-right">Score 12m {{ sortIcon('score_12m') }}</th>
+      <th @click="toggleSort('decile')">Décile {{ sortIcon('decile') }}</th>
     </tr>
     </thead>
     <tbody>
-    <tr v-for="stock in stocks" :key="stock.ticker">
+    <tr v-for="stock in sortedStocks" :key="stock.ticker">
       <td>
         <a class="number" href="#">{{ stock.ticker }}</a>
       </td>
@@ -68,12 +69,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getStocks } from '@/services/api'
 
 const stocks = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+// Sort state: default is score 12m descending (best performers on top)
+const sortKey = ref('score_12m')
+const sortAsc = ref(false)
+
+function toggleSort(key) {
+  if (sortKey.value === key) {
+    sortAsc.value = !sortAsc.value
+  } else {
+    sortKey.value = key
+    sortAsc.value = true
+  }
+}
+
+function sortIcon(key) {
+  if (sortKey.value !== key) return '⇅'
+  return sortAsc.value ? '↑' : '↓'
+}
+
+const sortedStocks = computed(() => {
+  return [...stocks.value].sort((a, b) => {
+    let valA = a[sortKey.value]
+    let valB = b[sortKey.value]
+
+    // Null values go to the end
+    if (valA == null) return 1
+    if (valB == null) return -1
+
+    if (typeof valA === 'string') {
+      valA = valA.toLowerCase()
+      valB = valB.toLowerCase()
+    }
+
+    if (valA < valB) return sortAsc.value ? -1 : 1
+    if (valA > valB) return sortAsc.value ? 1 : -1
+    return 0
+  })
+})
 
 function formatScore(value) {
   if (value == null) return '—'
@@ -210,4 +249,10 @@ onMounted(async () => {
 .decile-block.filled {
   background-color: var(--fs-bleu-accent);
 }
+
+th {
+  cursor: pointer;
+  user-select: none;
+}
 </style>
+

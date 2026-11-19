@@ -35,4 +35,9 @@ class SP500Github(TickerSource):
         if "Symbol" not in data_frame.columns:
             raise TickerFetchError("unexpected CSV format, 'Symbol' column missing")
 
+        data_frame = data_frame.rename(columns={
+            "Security": "Name",
+            "GICS Sector": "Sector",
+        })
+
         return data_frame[["Symbol", "Name", "Sector"]].to_dict("records")
